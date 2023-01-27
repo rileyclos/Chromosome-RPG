@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+        <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
+    <title></title>
+    <style media="screen">
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: Impact, sans-serif;
+      letter-spacing: 0.02em;
+      image-rendering: crisp-edges;
+    }
+    body {
+      background: black;
+      color: white;
+      font-size: 2em;
+      text-shadow: 0px 0px 20px red;
+    }
+    .right {
+      right: 0;
+      top: 0;
+      width: 60vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #ddd, #888);
+      position: fixed;
+    }
+    .lockerWrapper {
+      left: 0;
+      top: 0;
+      width: 40vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #333, black);
+      position: fixed;
+      box-shadow: 0px 0px 30px black;
+    }
+    h1 {
+      font-size: 3em;
+    }
+    .center {
+      text-align: center;
+    }
+    nav {
+      width: 100%;
+      background: white;
+      color: black;
+      text-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+    }
+    ul {
+      width: 100%;
+      overflow-x: scroll;
+      list-style-type: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      background: linear-gradient(to bottom, #000, #300, #000);
+    }
+    li {
+      float: left;
+      padding: 2px 8px;
+      cursor: default;
+      font-size: 0.8em;
+      background: transparent;
+      color: red;
+      text-align: center;
+      z-index: 0;
+      transition: .2s;
+      height: 100%;
+    }
+    li:hover {
+      background: linear-gradient(to bottom, #b00, #f00, #b00);
+      box-shadow: 0px 0px 20px red;
+      color: black;
+      z-index: 1;
+      transform: scale(1.1);
+    }
+    .list-things {
+      width: 80%;
+      margin-left: 10%;
+      border: 2px solid #f55;
+      margin-top: 10%;
+      height: 65%;
+      box-shadow: 0px 0px 50px red;
+      background: linear-gradient(to bottom, #000, #300, #000);
+      transform: translateX(-50vw) scale(0.8) rotate(-15deg);
+      transition: 1s cubic-bezier(.32,-0.01,0,1);
+      position: absolute;
+      box-sizing: border-box;
+      padding: 1rem;
+      text-align: center;
+    }
+    .list-things.none>div{text-align:center;}
+    h3 {
+      font-sise: 0.5em;
+    }
+    .show {
+      transform: none;
+    }
+    .tile {
+      border: 2px solid #f55;
+      width: 27%;
+      aspect-ratio: 1/1;
+      background: red;
+      display: inline-block;
+      box-shadow: 0px 0px 20px red;
+      background: linear-gradient(to bottom, #000, #300, #000);
+      transition: 250ms;
+      position: relative;
+    }
+    .tile:hover {
+      background: linear-gradient(to bottom, #b00, #f00, #b00);
+      box-shadow: 0px 0px 20px red;
+      color: black;
+      z-index: 1;
+      transform: scale(1.2);
+    }
+    .icon {
+      position: absolute;
+      width: 80%;
+      height: 80%;
+      left: 10%;
+      top: 10%;
+      background-image: linear-gradient(45deg,purple,black);
+      background-size: contain;
+    }
+    .all {
+      display: block;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      transform: none;
+      transition: 500ms;
+    }
+    .app-transition {
+      transform: scale(0.8) translateY(-500px);
+    }
+    button {
+      position: fixed;
+      right: 1.5rem;
+      top: 1rem;
+      z-index: 1000 !important;
+      background: linear-gradient(to bottom, #000, #300, #000);
+      color: red;
+      padding: 5px 20px;
+      border: 2px solid #f55;
+      box-shadow: 0px 0px 10px red;
+      font-size: 1.3rem;
+      transition: 500ms;
+    }
+    button:hover {
+      background: linear-gradient(to bottom, #b00, #f00, #b00);
+      box-shadow: 0px 0px 20px red;
+      color: black;
+      z-index: 1;
+      transform: scale(1.2);
+    }
+    div.blackCover {
+      width: 0;
+      height: 0;
+      z-index: 5;
+      background: black;
+      color: white;
+      font-size: 4rem !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transition: .5s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      left: 50vw;
+      top: 50vh;
+      text-shadow: none;
+    }
+    .init {
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 10 !important;
+      opacity: 1 !important;
+    }
+    .right {
+      color: white;
+      text-shadow: 0px 0px 1em black;
+    }
+    p {
+      font-size: 0.5em;
+      font-family: sans-serif;
+    }
+    .right>.itemMetaTop {
+      width: 100%;
+      background: linear-gradient(180deg, #000, transparent);
+      box-sizing: border-box;
+      padding: 3em 1em 2em 1em;
+      z-index: 400;
+    }
+    .right>.itemMetaBottom {
+        width: 100%;
+        background: linear-gradient(0, #000, transparent);
+        box-sizing: border-box;
+        padding: 3em 1em 2em 1em;
+        position: absolute;
+        bottom: 0;
+    }
+    .itemImageDisplay {
+      height: 100%;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -5;
+      background-image: none;
+      background-size: contain;
+      background-position: right;
+      background-repeat: no-repeat;
+      transition: 500ms;
+    }
+    </style>
+    <button onclick="loadURL('../index.html')">Back to Lobby</button>
+<div class=all>
+  <div class="blackCover init">
+    LOADING...
+  </div>
+  <link rel="stylesheet" type=text/css href="items.css">
+  </head>
+  <body>
+  <script type="text/javascript" src=assets/item_meta.js>
+
+  </script>
+    Loading locker...
+    <div class="right">
+      <div class="itemImageDisplay" id="itemImageDisplay"></div>
+      <div class="itemMetaTop">
+      <h3 id=itemTitle>ITEM NAME</h3>
+      <p id=itemDescription>Hover an item to see info about it.</p>
+      </div>
+      <div class="itemMetaBottom">
+        <p id=itemHealthMeta>Health Gain: </p>
+        <p id=itemShieldMeta>Shield Gain: </p>
+        <p id=itemAttackMeta>Attack Damage: </p>
+        <p id=itemRangeMeta>Range: </p>
+        <p id=itemID>ID: </p>
+      </div>
+    </div>
+    <div class="lockerWrapper">
+      <span class=center><h1>LOCKER</h1></span><br>
+      <nav>
+        <ul>
+          <li onclick=cat(1)>ITEMS</li>
+          <li onclick=cat(2)>EFFECTS</li>
+          <li onclick=cat(3)>POTIONS</li>
+          <li onclick=cat(4)>LOADOUT</li>
+          <li onclick=cat(5)>PLAYER<li>
+        </ul>
+      </nav>
+      <div class="list-things show">
+        <div>
+          <h3>Select a category.</h3>
+        </div>
+      </div>
+      <div class="list-things" id=cat1>
+        ITEMS<br><br>
+        <div class="tile"><div class="icon sword_amethyst"></div></div>
+        <div class="tile"><div class="icon sword_wood_placeholder"></div></div>
+        <div class="tile"><div class="icon amethyst"></div></div>
+        <div class="tile"><div class="icon coin"></div></div>
+        <div class="tile"><div class="icon stick"></div></div>
+        <div class="tile"><div class="icon rock"></div></div>
+      </div>
+      <div class="list-things" id=cat2>
+        EFFECTS
+      </div>
+      <div class="list-things" id=cat3>
+        POTIONS
+      </div>
+      <div class="list-things" id=cat4>
+        LOADOUT
+      </div>
+      <div class="list-things" id=cat5>
+        PLAYERS<br><br>
+        <div class="tile"><div class="icon player_red"></div></div>
+        <div class="tile"><div class="icon player_orange"></div></div>
+        <div class="tile"><div class="icon player_yellow"></div></div>
+        <div class="tile"><div class="icon player_green"></div></div>
+        <div class="tile"><div class="icon player_blue_light"></div></div>
+        <div class="tile"><div class="icon player_blue"></div></div>
+        <div class="tile"><div class="icon player_purple"></div></div>
+        <div class="tile"><div class="icon player_pink"></div></div>
+      </div>
+    </div>
+      <script type="text/javascript">
+        function cat(c) {
+          $(".list-things").removeClass("show");
+          $(".list-things").removeClass("none");
+          $("#cat"+c).addClass("show");
+        }
+        $(function(){
+          $(".blackCover").removeClass("init");
+        })
+          function loadURL(address) {
+            $(".blackCover").addClass("init");
+            setTimeout(function(){location.href = address;},500);
+          }
+        $(".icon").mouseover(function(){
+          let itemClass = $(this).attr('class').split(' ')[1];
+          showMeta(itemClass);
+          //if this script doesnt work check the class name and make sure there isnt any extra spaces//
+        })
+        $('.icon').mouseout(function(){
+          hideMeta()
+        })
+        function showMeta(c) {
+          let meta = eval(c+"_meta");
+          $("#itemTitle").text(meta[0]);
+          $("#itemDescription").text(meta[1]);
+          $("#itemHealthMeta").append(meta[2]);
+          $("#itemShieldMeta").append(meta[3]);
+          $("#itemAttackMeta").append(meta[4]);
+          $("#itemRangeMeta").append(meta[5]);
+          $("#itemID").append(c);
+          $(".itemImageDisplay").addClass(c);
+          console.log(c)
+          console.log($("#itemImageDisplay").attr('class'))
+        }
+        function hideMeta() {
+          $("#itemTitle").text("ITEM NAME");
+          $("#itemDescription").text("Hover an item to see info about it.");
+          $("#itemHealthMeta").text("Health Gain: ");
+          $("#itemShieldMeta").text("Shield Gain: ");
+          $("#itemAttackMeta").text("Attack Damage: ");
+          $("#itemRangeMeta").text("Range: ");
+          $("#itemID").text("ID: ");
+          $(".itemImageDisplay").removeClass();
+          $("#itemImageDisplay").addClass("itemImageDisplay");
+          console.log($("#itemImageDisplay").attr('class'))
+        }
+      </script>
+    </div>
+  </body>
+</html>

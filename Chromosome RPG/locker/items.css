@@ -1,0 +1,19 @@
+.sword_wood_placeholder{background-image:url(assets/textures/items/sword_wood_placeholder.png)}
+.sword_amethyst{background-image:url(assets/textures/items/sword_amethyst.png)}
+.amethyst{background-image:url(assets/textures/items/amethyst.png)}
+.coin{animation:coinAnimate 1s linear infinite}
+.stick{background-image:url(assets/textures/items/stick.png)}
+.rock{background-image:url(assets/textures/items/rock.png)}
+.player_red{background-image:url(assets/textures/player/player_red.png)}
+.player_orange{background-image:url(assets/textures/player/player_orange.png)}
+.player_yellow{background-image:url(assets/textures/player/player_yellow.png)}
+.player_green{background-image:url(assets/textures/player/player_green.png)}
+.player_blue_light{background-image:url(assets/textures/player/player_blue_light.png)}
+.player_blue{background-image:url(assets/textures/player/player_blue.png)}
+.player_purple{background-image:url(assets/textures/player/player_purple.png)}
+.player_pink{background-image:url(assets/textures/player/player_pink.png)}
+/*
+//animations go below me//
+*/
+@keyframes coinAnimate {
+  0%{background-image:url(assets/textures/items/coin_front.png);transform: scalex(1);}24%{background-image:url(assets/textures/items/coin_front.png);transform:scalex(1);}25%{background-image:url(assets/textures/items/coin_side.png);transform: scalex(1);}49%{background-image:url(assets/textures/items/coin_side.png);transform:scalex(1);}50%{background-image:url(assets/textures/items/coin_front.png);transform:scalex(-1);}74%{background-image:url(assets/textures/items/coin_front.png);transform:scalex(-1);}75%{background-image:url(assets/textures/items/coin_side.png);transform:scalex(1);}100%{background-image:url(assets/textures/items/coin_side.png);transform:scalex(1);}}

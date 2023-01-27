@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <link
+  rel="stylesheet"
+  href="https://unpkg.com/98.css"
+>
+    <style media="screen">
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      @font-face {
+        font-family: ms-sans;
+        src: url(assets/W95FA.otf);
+      }
+      body {
+        overflow: hidden;
+        background: #062;
+      }
+      div.debug {
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: 200px;
+        min-height: 100px;
+        padding-bottom: 20px;
+        padding-left: 20px;
+        background: rgba(0,0,0,.5);
+        border-radius: 0px 0px 0px 20px;
+      }
+      div.debug>p {
+        color:white;
+        border:1px solid red;
+        display: inline;
+      }
+      div.debug>p:hover{
+        color:red;
+        background:black;
+      }
+      img {
+        display: none;
+      }
+      .window {
+        position: fixed;
+        right: 0;
+        top: 0;
+        font-size: 1em;
+      }
+      div.blackCover {
+        display: none;
+        position: fixed !important;
+        right: calc(50% - 50px) !important;
+        top: 45%;
+        bottom: auto !important;
+        z-index: 10 !important;
+      }
+      .init {
+        display: block !important;
+      }
+      #gameWrapper {
+        position: fixed;
+        display: block;
+        left: calc(50% - 384px);
+        top: calc(50% - 256px);
+        transform: scale(1.4);
+        image-rendering: pixelated;
+        border: 5px solid black;
+        background: black;
+      }
+    </style>
+    <div class="window blackCover init" style=width:100px>
+      <div class="title-bar">
+        <div class="title-bar-text">
+          LOADING...
+        </div>
+      </div>
+      <div class="window-body">
+        LOADING...
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
+    <meta charset="utf-8">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js" integrity="sha256-xLD7nhI62fcsEZK2/v8LsBcb4lG7dgULkuXoXB/j91c=" crossorigin="anonymous"></script>
+    <title>game</title>
+    <script type="text/javascript" src="gameSections.js">
+
+    </script>
+  </head>
+  <body>
+    <img src="../locker/assets/textures/player/player_red.png" alt="face" id="faceImage">
+    <img src="../locker/assets/textures/player/player_blue.png" alt="face" id="faceImage2">
+    <img src="../locker/assets/textures/tiles/grass.png" id="b0">
+    <img src="../locker/assets/textures/tiles/bricks.png" id="b1">
+    <img src="../locker/assets/textures/gui/hotbar.png" id="hotbar">
+    <img src="../locker/assets/textures/tiles/placeholder_tile.png" id="b-1">
+    <img src="../locker/assets/textures/items/rock.png" id="b2">
+    <img src="../locker/assets/textures/tiles/plank.png" id="b3">
+    <canvas id="gameWrapper" width="0" height="0"></canvas>
+    <div class="window" style=width:200px>
+      <div class="title-bar">
+        <div class="title-bar-text">
+          debug
+        </div>
+        <div class="title-bar-controls">
+          <button aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="window-body">
+      <p id=pPosX>loading pPosX</p>
+      <p id=pPosY>loading pPosY</p>
+      <p id=pPChangeX>loading pPChangeX</p>
+      <p id=pPChangeY>loading pPChangeY</p>
+      <p id=moveAmount>loading moveAmount</p>
+      <p id=negMoveAmount>loading negMoveAmount</p>
+      <input type="range" id=fpsrange min=5 max=145 value="60" step=5>
+      <p id=fps>loading fps</p>
+      <p id=fpsjs>loading fpsjs</p>
+      <p id=regionX>loading regionX</p>
+      <p id=regionY>loading regionY</p>
+      <button onclick="loadURL('../index.html')">back to lobby</button>
+      <button onclick="resetLocalStorage()">reset LSKs</button>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+  tilex = 0;
+  tiley = 0;
+  function resetLocalStorage(){
+    pPosX = 386;
+    pPosY = 32;
+    localStorage.setItem('CHRMSMpPosX', 386);
+    localStorage.setItem('CHRMSMpPosY', 32);
+    localStorage.setItem('CHRMSMregionX', 0);
+    localStorage.setItem('CHRMSMregionY', 0);
+  }
+  $(function(){
+    $(".blackCover").removeClass("init");
+  })
+  $(function(){
+    $(".window").draggable({
+      handle: ".title-bar"
+    });
+    var fps = $("#fpsrange").val();
+//    const windowHeight = $(window).height()
+//    const windowWidth = $(window).width()
+    const windowHeight = 512;
+    const windowWidth = 768;
+    const wrapperInit = document.getElementById("gameWrapper");
+    const gW = wrapperInit.getContext("2d");
+    const gw = gW;
+    const moveAmount = 3;
+    const negMoveAmount = moveAmount*-1
+    var pPosX = 386;
+    var pPosY = 32;
+    var regionX = 0;
+    var regionY = 0;
+    if (localStorage.getItem('CHRMSMpPosX')!==null) {
+      var pPosX = parseInt(localStorage.getItem('CHRMSMpPosX'));
+      var pPosY = parseInt(localStorage.getItem('CHRMSMpPosY'));
+      var regionX = parseInt(localStorage.getItem('CHRMSMregionX'));
+      var regionY = parseInt(localStorage.getItem('CHRMSMregionY'));
+    }
+    var pPChangeX = 0;
+    var pPChangeY = 0;
+    var fpsjs = 1000/fps
+    const upd = 16
+    $("#gameWrapper").attr("width",windowWidth);
+    $("#gameWrapper").attr("height",windowHeight);
+    gW.moveTo(0,0);
+    function renderLoop() {
+      renderGame();
+      setTimeout(renderLoop,fpsjs);
+    }
+    renderLoop();
+    function renderGame() {
+      clear();
+      //render region error screen//
+      gw.font = "48px serif";
+      gw.fillStyle = "white";
+      gw.fillText("err: Region undefined", 0, 100);
+      const cachedRegionX = regionX
+      const cachedRegionY = regionY
+      //render the area//
+      if(pPosX<=0){
+        regionX = cachedRegionX-1
+        pPosX = 718;
+      } else if (pPosX>=768) {
+        regionX = cachedRegionX+1
+        pPosX = 50;
+      }
+      if(pPosY<=0){
+        regionY = cachedRegionY+1
+        pPosY = 412;
+      } else if (pPosY>=462) {
+        regionY = cachedRegionY-1
+        pPosY = 50;
+      }
+      renderRegion(regionX, regionY);
+      //render player 1//
+      gw.imageSmoothingEnabled = false;
+      gw.drawImage(document.getElementById("faceImage"), pPosX-30, pPosY-10, 96, 96);
+      //render hotbar//
+      gw.imageSmoothingEnabled = false;
+      gw.drawImage(document.getElementById("hotbar"), 360, 448, 384, 64);
+      localStorage.setItem('CHRMSMpPosX', pPosX)
+      localStorage.setItem('CHRMSMpPosY', pPosY)
+      localStorage.setItem('CHRMSMregionX', regionX)
+      localStorage.setItem('CHRMSMregionY', regionY)
+    }
+    function clear() {
+      gW.clearRect(0, 0, windowWidth, windowHeight);
+      gW.moveTo(0,0)
+    }
+    setInterval(function(){
+      pPosX = pPosX+pPChangeX;
+      pPChangeX = pPChangeX*0.4;
+      pPosY = pPosY+pPChangeY;
+      pPChangeY = pPChangeY*0.4;
+      $("#pPChangeY").text("pPChangeY="+Math.round(pPChangeY));
+      $("#pPChangeX").text("pPChangeX="+Math.round(pPChangeX));
+      $("#pPosX").text("pPosX="+Math.round(pPosX));
+      $("#pPosY").text("pPosY="+Math.round(pPosY));
+      $("#moveAmount").text("moveAmount="+moveAmount);
+      $("#negMoveAmount").text("negMoveAmount="+negMoveAmount);
+      fps = $("#fpsrange").val()
+      fpsjs = 1000/fps
+      $("#fps").text("fps:"+fps);
+      $("#fpsjs").text("fpsjs:"+Math.round(fpsjs));
+      $("#regionX").text("regionX:"+Math.round(regionX));
+      $("#regionY").text("regionY:"+Math.round(regionY));
+      //movement//
+      if(yC!=0){
+        pPChangeY = pPChangeY+yC;
+      }
+      if(xC!=0){
+        pPChangeX = pPChangeX+xC;
+      }
+    },upd);
+    var yC = 0
+    var xC = 0
+    $(document).on("keydown", function(e){
+      e.preventDefault()
+      if(e.which==87){
+        yC = negMoveAmount
+      }
+      if(e.which==65){
+        xC = negMoveAmount
+      }
+      if(e.which==83){
+        yC = moveAmount
+      }
+      if(e.which==68){
+        xC = moveAmount
+      }
+    });
+    $(document).on("keyup", function(e){
+      e.preventDefault()
+      if(e.which==87){
+        yC = 0
+      }
+      if(e.which==65){
+        xC = 0
+      }
+      if(e.which==83){
+        yC = 0
+      }
+      if(e.which==68){
+        xC = 0
+      }
+    });
+    async function renderRegion(x, y) {
+      var rPX = null;
+      var rPY = null;
+      if(x>=0){rPX="p"}
+      if(x<0){rPX="n"}
+      if(y>=0){rPY="p"}
+      if(y<0){rPY="n"}
+      x=Math.abs(x);
+      y=Math.abs(y);
+      if(typeof eval("reg"+rPX+x+rPY+y) == 'undefined' || eval("reg"+rPX+x+rPY+y) == null){
+        console.error("ERROR: REGION DOES NOT EXIST");
+        alert("ERROR: REGION DOES NOT EXIST");
+      } else {
+      let section = eval("reg"+rPX+x+rPY+y);
+      tilex = 0;
+      tiley = 0;
+      k=0
+      for(j=0;j<8;j++){
+        for(i=0;i<12;i++){
+          k++
+          gw.imageSmoothingEnabled = false;
+          gw.drawImage(document.getElementById("b"+section[k]), tilex, tiley, 64, 64);
+          tilex+=64;
+        }
+        tilex = 0;
+        tiley = tiley + 64;
+      }
+    }}
+  });
+    function loadURL(address) {
+      $(".blackCover").addClass("init");
+      setTimeout(function(){location.href = address;},500);
+    }
+  </script>
+</html>

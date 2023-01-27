@@ -1,0 +1,272 @@
+<html lang="en" dir="ltr"><head>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <style media="screen">
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      @font-face {
+        font-family: ms-sans;
+        src: url(assets/W95FA.otf);
+      }
+      body {
+        overflow: hidden;
+        background: black;
+      }
+      div.debug {
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: 200px;
+        min-height: 100px;
+        padding-bottom: 20px;
+        padding-left: 20px;
+        background: rgba(0,0,0,.5);
+        border-radius: 0px 0px 0px 20px;
+      }
+      div.debug>p {
+        color:white;
+        border:1px solid red;
+        display: inline;
+      }
+      div.debug>p:hover{
+        color:red;
+        background:black;
+      }
+      img {
+        display: none;
+      }
+      .window {
+        position: fixed;
+        right: 0;
+        top: 0;
+        font-size: 1em;
+      }
+      div.blackCover {
+        display: none;
+        position: fixed !important;
+        right: calc(50% - 50px) !important;
+        top: 45%;
+        bottom: auto !important;
+        z-index: 10 !important;
+      }
+      .init {
+        display: block !important;
+      }
+    </style>
+    </head><body><div class="window blackCover ui-draggable" style="width:100px">
+      <div class="title-bar ui-draggable-handle">
+        <div class="title-bar-text">
+          LOADING...
+        </div>
+      </div>
+      <div class="window-body">
+        LOADING...
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
+    <meta charset="utf-8">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js" integrity="sha256-xLD7nhI62fcsEZK2/v8LsBcb4lG7dgULkuXoXB/j91c=" crossorigin="anonymous"></script>
+    <title>game</title>
+
+
+    <img src="assets/face.webp" alt="face" id="faceImage">
+    <img src="assets/face2.png" alt="face" id="faceImage2">
+    <canvas id="gameWrapper" width="1680" height="885" style=""></canvas>
+    <div class="window ui-draggable" style="width:200px">
+      <div class="title-bar ui-draggable-handle">
+        <div class="title-bar-text">
+          debug
+        </div>
+        <div class="title-bar-controls">
+          <button aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="window-body">
+      <p id="pPosX">pPosX=653</p>
+      <p id="pPosY">pPosY=415</p>
+      <p id="pPChangeX">pPChangeX=0</p>
+      <p id="pPChangeY">pPChangeY=0</p>
+      <p id="moveAmount">moveAmount=0.9</p>
+      <p id="negMoveAmount">negMoveAmount=-0.9</p>
+      <input type="range" id="fpsrange" min="5" max="145" value="60" step="5">
+      <p id="fps">fps:60</p>
+      <p id="fpsjs">fpsjs:17</p>
+      <button onclick="loadURL('../index.html')">back to lobby</button>
+      </div>
+    </div>
+
+  <script type="text/javascript">
+  $(function(){
+    $(".blackCover").removeClass("init");
+  })
+  $(function(){
+    $(".window").draggable({
+      handle: ".title-bar"
+    });
+    $("#gameWrapper").slideUp(0);
+    setTimeout(function(){$("#gameWrapper").slideDown(400);},1)
+    var fps = $("#fpsrange").val();
+    const windowHeight = $(window).height()
+    const windowWidth = $(window).width()
+    const wrapperInit = document.getElementById("gameWrapper");
+    const gW = wrapperInit.getContext("2d");
+    const gw = gW;
+    const moveAmount = 0.9;
+    const negMoveAmount = moveAmount*-1
+    var pPosX = 50;
+    var pPosY = 100;
+    var p2PosX = 100;
+    var p2PosY = 100;
+    var pPChangeX = 0;
+    var pPChangeY = 0;
+    var p2PChangeX = 0;
+    var p2PChangeY = 0;
+    var fpsjs = 1000/fps
+    const upd = 16
+    $("#gameWrapper").attr("width",windowWidth);
+    $("#gameWrapper").attr("height",windowHeight);
+    gW.moveTo(0,0);
+    function renderLoop() {
+      renderGame();
+      setTimeout(renderLoop,fpsjs);
+    }
+    renderLoop();
+    function renderGame() {
+      clear();
+      //render the backdrop//
+      var grd = gw.createLinearGradient(0, 0, 0, windowHeight*3);
+      grd.addColorStop(0, "aqua");
+      grd.addColorStop(1, "blue");
+      gw.fillStyle = grd;
+      gw.fillRect(0,0,windowWidth,windowHeight);
+      var grd = gw.createLinearGradient(0, windowHeight*0.8, 0, windowHeight);
+      grd.addColorStop(0, "lime");
+      grd.addColorStop(1, "green");
+      gw.fillStyle = grd;
+      gw.fillRect(0, windowHeight*0.8, windowWidth, windowHeight);
+      //render player 1//
+      gw.fillStyle = "yellow";
+      gw.beginPath();
+      gw.arc(pPosX, pPosY, 30, 0, 2 * Math.PI);
+      gw.fill();
+      gw.drawImage(document.getElementById("faceImage"), pPosX-30, pPosY-30, 60, 60);
+      //render player 2//
+      gw.fillStyle = "purple";
+      gw.beginPath();
+      gw.arc(p2PosX, p2PosY, 30, 0, 2 * Math.PI);
+      gw.fill();
+      gw.drawImage(document.getElementById("faceImage2"), p2PosX-34, p2PosY-34, 67, 67);
+    }
+    function clear() {
+      gW.clearRect(0, 0, windowWidth, windowHeight);
+      gW.moveTo(0,0)
+    }
+    setInterval(function(){
+      pPosX = pPosX+pPChangeX;
+      pPChangeX = pPChangeX*0.9;
+      pPosY = pPosY+pPChangeY;
+      pPChangeY = pPChangeY*0.9;
+      p2PosX = p2PosX+p2PChangeX;
+      p2PChangeX = p2PChangeX*0.9;
+      p2PosY = p2PosY+p2PChangeY;
+      p2PChangeY = p2PChangeY*0.9;
+      $("#pPChangeY").text("pPChangeY="+Math.round(pPChangeY));
+      $("#pPChangeX").text("pPChangeX="+Math.round(pPChangeX));
+      $("#pPosX").text("pPosX="+Math.round(pPosX));
+      $("#pPosY").text("pPosY="+Math.round(pPosY));
+      $("#moveAmount").text("moveAmount="+moveAmount);
+      $("#negMoveAmount").text("negMoveAmount="+negMoveAmount);
+      fps = $("#fpsrange").val()
+      fpsjs = 1000/fps
+      $("#fps").text("fps:"+fps);
+      $("#fpsjs").text("fpsjs:"+Math.round(fpsjs));
+      //movement//
+      if(yC!=0){
+        pPChangeY = pPChangeY+yC;
+      }
+      if(xC!=0){
+        pPChangeX = pPChangeX+xC;
+      }
+      if(y2C!=0){
+        p2PChangeY = p2PChangeY+y2C;
+      }
+      if(x2C!=0){
+        p2PChangeX = p2PChangeX+x2C;
+      }
+    },upd);
+    var yC = 0
+    var xC = 0
+    var y2C = 0
+    var x2C = 0
+
+    $(document).on("keydown", function(e){
+      e.preventDefault()
+      if(e.which==87){
+        yC = negMoveAmount
+      }
+      if(e.which==65){
+        xC = negMoveAmount
+      }
+      if(e.which==83){
+        yC = moveAmount
+      }
+      if(e.which==68){
+        xC = moveAmount
+      }
+    });
+    $(document).on("keyup", function(e){
+      e.preventDefault()
+      if(e.which==87){
+        yC = 0
+      }
+      if(e.which==65){
+        xC = 0
+      }
+      if(e.which==83){
+        yC = 0
+      }
+      if(e.which==68){
+        xC = 0
+      }
+    });
+    //p2 movement//
+    $(document).on("keydown",function(e){
+      e.preventDefault()
+      if(e.which==38){
+        y2C = negMoveAmount
+      }
+      if(e.which==37){
+        x2C = negMoveAmount
+      }
+      if(e.which==40){
+        y2C = moveAmount
+      }
+      if(e.which==39){
+        x2C = moveAmount
+      }
+    });
+    $(document).on("keyup",function(e){
+      e.preventDefault()
+      if(e.which==38){
+        y2C = 0
+      }
+      if(e.which==37){
+        x2C = 0
+      }
+      if(e.which==40){
+        y2C = 0
+      }
+      if(e.which==39){
+        x2C = 0
+      }
+    })
+  });
+    function loadURL(address) {
+      $(".blackCover").addClass("init");
+      setTimeout(function(){location.href = address;},500);
+    }
+
+  </script>
+
+</body></html>
